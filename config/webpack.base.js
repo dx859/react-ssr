@@ -1,8 +1,10 @@
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 
+const isProduction = process.env.NODE_ENV === "production";
+
 module.exports = function(isServer = false) {
   return {
-    mode: "production",
+    mode: isProduction ? "production" : "development",
     module: {
       rules: [
         {
@@ -19,7 +21,8 @@ module.exports = function(isServer = false) {
           exclude: /node_moduels/,
           use: [
             isServer && "isomorphic-style-loader",
-            !isServer && MiniCssExtractPlugin.loader,
+            !isServer &&
+              (isProduction ? MiniCssExtractPlugin.loader : "style-loader"),
             {
               loader: "css-loader",
               options: {

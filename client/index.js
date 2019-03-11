@@ -1,5 +1,17 @@
 import React from "react";
 import ReactDOM from "react-dom";
-import App from "./App";
+import { BrowserRouter, Route, Switch } from "react-router-dom";
+import App from "./views/App";
+import { Provider } from "react-redux";
+import {getClientStore} from "./stores";
 
-ReactDOM.render(<App />, document.body);
+const store = getClientStore(window);
+
+ReactDOM.hydrate(
+  <Provider store={store}>
+    <BrowserRouter>
+      <App />
+    </BrowserRouter>
+  </Provider>,
+  document.getElementById("root")
+);

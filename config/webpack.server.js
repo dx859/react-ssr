@@ -4,7 +4,6 @@ const merge = require("webpack-merge");
 const baseConfig = require("./webpack.base");
 
 const config = {
-  mode: "development",
   entry: paths.serverEntryPath,
   output: {
     path: paths.appBuild,

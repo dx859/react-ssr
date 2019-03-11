@@ -1,25 +1,14 @@
 const paths = require("./paths");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
+const merge = require("webpack-merge");
+const baseConfig = require("./webpack.base");
 
-module.exports = {
+const config = {
   entry: paths.indexPath,
   output: {
     path: paths.appBuild,
     filename: "[name].[contenthash:8].js",
     publicPath: "/public"
-  },
-  module: {
-    rules: [
-      {
-        test: /\.js$/,
-        exclude: /node_modules/,
-        loader: "babel-loader",
-        options: {
-          presets: ["@babel/env", "@babel/preset-react"],
-          plugins: ["@babel/plugin-proposal-class-properties"]
-        }
-      }
-    ]
   },
   plugins: [
     new HtmlWebpackPlugin({
@@ -27,3 +16,5 @@ module.exports = {
     })
   ]
 };
+
+module.exports = merge(baseConfig(), config);

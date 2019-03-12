@@ -18,7 +18,7 @@ if (isProduction) {
   app.use("/public", express.static(paths.appBuild));
 
   app.get("*", function(req, res) {
-    const appString = ReactDOMServer.renderToString(serverEntry);
+    const appString = ReactDOMServer.renderToString(serverEntry.createApp(req.path));
     res.send(template.replace("<!-- appString -->", appString));
   });
 } else {

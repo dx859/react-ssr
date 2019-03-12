@@ -68,17 +68,20 @@ module.exports = function(app) {
     })
   );
 
-  app.get("*", function(req, res, next) {
+  app.use("/:tenant", function(req, res, next) {
     if (!serverBundle) {
       return res.send("waiting for compile");
     }
     getTemplate().then(template => {
       const createApp = serverBundle.default;
+      const context = {tenant: req.params.tenant}
 
       let appString = "";
       try {
-        appString = ReactDOMServer.renderToString(createApp(req.path));
-      } catch (e) {}
+        appString = ReactDOMServer.renderToString(createApp(req.originalUrl, context));
+      } catch (e) {
+        console.log(e)
+      }
       res.send(template.replace("<!-- appString -->", appString));
     });
   });

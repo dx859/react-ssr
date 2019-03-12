@@ -7,9 +7,11 @@ import {getClientStore} from "./stores";
 
 const store = getClientStore(window);
 
+let context = {tenant: window.location.pathname.split('/')[1]}
+
 ReactDOM.hydrate(
   <Provider store={store}>
-    <BrowserRouter>
+    <BrowserRouter context={context}>
       <App />
     </BrowserRouter>
   </Provider>,

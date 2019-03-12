@@ -1,26 +1,26 @@
 import React, { useEffect } from "react";
 import { Route } from "react-router-dom";
 import "./App.css";
-import Home from "./Home";
 import { queryString } from "../utils/urlUtils";
-import apiFetch from "../utils/apiFetch";
+import { connect } from "react-redux";
+import { fetchWebConfig } from "../stores/webConfig";
+import Layout from "./Layout";
 
 const App = props => {
   useEffect(() => {
     let qs = queryString(window.location.search);
-    apiFetch.get(
-      "/api?r=CzSupplier/api/run&o=znjs&p=cgsupplier.common.site-config"
-    ).then(data=>{
-      console.log(data);
-    })
-
+    props.fetchWebConfig();
   }, []);
+  console.log("render=>App");
 
   return (
     <>
-      <Route path="/:tenant" component={Home} />
+      <Route path="/:tenant" component={Layout} />
     </>
   );
 };
 
-export default App;
+export default connect(
+  null,
+  { fetchWebConfig }
+)(App);

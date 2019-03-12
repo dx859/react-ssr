@@ -6,10 +6,11 @@ import { getServerStore } from "./stores";
 
 const defaultStore = getServerStore();
 
-const createApp = (path, store = defaultStore) => {
+const createApp = (path, context = {}, store = defaultStore) => {
+  console.log('path=>',path)
   return (
     <Provider store={store}>
-      <StaticRouter location={path} context={{}}>
+      <StaticRouter location={path} context={context}>
         <App />
       </StaticRouter>
     </Provider>

@@ -1,0 +1,41 @@
+.header {
+  box-sizing: border-box;
+  height: 80px;
+  background: #FFFFFF;
+  box-shadow: 0 2px 8px 0 rgba(30, 52, 81, 0.09);
+}
+
+.wrap {
+  max-width: 1010px;
+  height: 100%;
+  margin: auto;
+  line-height: 80px;
+}
+.logo {
+  max-height: 45px;
+  max-width: 250px;
+}
+.btnGroup {
+  float: right;
+  width: 180px;
+  text-align: right;
+}
+ a {
+
+  padding: 0 15px;
+  display: inline-block;
+  height: 31px;
+  line-height: 31px;
+  font-size: 14px;
+  text-align: center;
+  border-radius: 2px;
+  text-decoration: none;
+}
+.registerTxt {
+  color: #222222;
+
+}
+
+.notImp {
+  color: #222222;
+}

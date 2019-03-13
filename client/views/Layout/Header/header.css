@@ -1,0 +1,24 @@
+.header {
+  box-sizing: border-box;
+  height: 80px;
+  background: #ffffff;
+  box-shadow: 0 2px 8px 0 rgba(30, 52, 81, 0.09);
+}
+
+.wrap {
+  max-width: 1010px;
+  height: 100%;
+  margin: auto;
+  line-height: 80px;
+}
+.logo {
+  vertical-align: middle;
+  max-height: 50px;
+  max-width: 300px;
+}
+
+.btnGroup {
+  float: right;
+  width: 180px;
+  text-align: right;
+}

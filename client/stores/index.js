@@ -9,7 +9,10 @@ const reducer = combineReducers({
 
 export const getClientStore = (window = {}) => {
   const defaultState =
-    window.context && window.context.state ? window.context.state : {};
+    window.__INITIAL__STATE__ && window.__INITIAL__STATE__
+      ? window.__INITIAL__STATE__
+      : {};
+
   return window.__REDUX_DEVTOOLS_EXTENSION__
     ? createStore(
         reducer,

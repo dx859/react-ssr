@@ -6,12 +6,14 @@ const webpack = require("webpack");
 const MemoryFs = require("memory-fs");
 const proxy = require("http-proxy-middleware");
 const ReactDOMServer = require("react-dom/server");
+const asyncBootstrap = require("react-async-bootstrapper");
+const ejs = require("ejs");
 const paths = require("../../config/paths");
 
 const getTemplate = () => {
   return new Promise((resolve, reject) => {
     axios
-      .get("http://127.0.0.1:8888/public/index.html")
+      .get("http://127.0.0.1:8888/public/server.ejs")
       .then(res => {
         resolve(res.data);
       })
@@ -73,16 +75,45 @@ module.exports = function(app) {
       return res.send("waiting for compile");
     }
     getTemplate().then(template => {
-      const createApp = serverBundle.default;
-      const context = {tenant: req.params.tenant}
-
-      let appString = "";
+      appString = "";
+      const { createApp, getServerStore } = serverBundle;
+      const store = getServerStore();
+      const routerContext = {};
       try {
-        appString = ReactDOMServer.renderToString(createApp(req.originalUrl, context));
+        let app = createApp(req.originalUrl, store, routerContext);
+
+        asyncBootstrap(app).then(() => {
+          if (routerContext.action === "REPLACE") {
+            res.redirect(routerContext.url);
+            return;
+          }
+
+          content = ReactDOMServer.renderToString(app);
+          const html = ejs.render(template, {
+            appString: content,
+            initialState: JSON.stringify(store.getState()),
+            meta: "", //helmet.meta.toString(),
+            title: "", // helmet.title.toString(),
+            style: "", // helmet.style.toString(),
+            link: "", //helmet.link.toString(),
+            materialCss: "" // sheetsRegistry.toString()
+          });
+          res.send(html);
+          return;
+        });
       } catch (e) {
-        console.log(e)
+        console.log(e);
       }
-      res.send(template.replace("<!-- appString -->", appString));
+      const html = ejs.render(template, {
+        appString: "",
+        initialState: JSON.stringify(store.getState()),
+        meta: "", //helmet.meta.toString(),
+        title: "", // helmet.title.toString(),
+        style: "", // helmet.style.toString(),
+        link: "", //helmet.link.toString(),
+        materialCss: "" // sheetsRegistry.toString()
+      });
+      res.send(html);
     });
   });
 };

@@ -42,6 +42,7 @@ const getStyleLoaders = (isServer, preProcessor) => {
 module.exports = function(isServer = false) {
   return {
     mode: isProduction ? "production" : "development",
+    devtool: isProduction ? "source-map" : "cheap-module-source-map",
     module: {
       rules: [
         {

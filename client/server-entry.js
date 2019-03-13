@@ -2,15 +2,13 @@ import React from "react";
 import { StaticRouter } from "react-router-dom";
 import App from "./views/App";
 import { Provider } from "react-redux";
-import { getServerStore } from "./stores";
+import { getServerStore } from "./stores/index";
 
-const defaultStore = getServerStore();
-
-const createApp = (path, context = {}, store = defaultStore) => {
-  console.log('path=>',path)
+// react-async-bootstrapper
+const createApp = (url, store, routerContext) => {
   return (
     <Provider store={store}>
-      <StaticRouter location={path} context={context}>
+      <StaticRouter location={url} context={routerContext}>
         <App />
       </StaticRouter>
     </Provider>
@@ -19,4 +17,4 @@ const createApp = (path, context = {}, store = defaultStore) => {
 
 export default createApp;
 
-export { createApp };
+export { createApp, getServerStore };

@@ -6,9 +6,11 @@ const webpack = require("webpack");
 const MemoryFs = require("memory-fs");
 const proxy = require("http-proxy-middleware");
 const ReactDOMServer = require("react-dom/server");
-const asyncBootstrap = require("react-async-bootstrapper");
 const ejs = require("ejs");
 const paths = require("../../config/paths");
+const serverRender = require("./server-render");
+const matchRoutes = require("react-router-config").matchRoutes;
+const config = require("../config");
 
 const getTemplate = () => {
   return new Promise((resolve, reject) => {
@@ -64,7 +66,7 @@ module.exports = function(app) {
   app.use(
     "/api",
     proxy({
-      target: "http://cg-test.myyscm.com/bms/index.php",
+      target: config.apiPrefix,
       pathRewrite: { "^/api": "" },
       changeOrigin: true
     })
@@ -75,45 +77,53 @@ module.exports = function(app) {
       return res.send("waiting for compile");
     }
     getTemplate().then(template => {
-      appString = "";
-      const { createApp, getServerStore } = serverBundle;
-      const store = getServerStore();
-      const routerContext = {};
-      try {
-        let app = createApp(req.originalUrl, store, routerContext);
+      const { createApp, getServerStore, routes } = serverBundle;
 
-        asyncBootstrap(app).then(() => {
-          if (routerContext.action === "REPLACE") {
-            res.redirect(routerContext.url);
-            return;
-          }
+      const store = getServerStore(config.apiPrefix, req.params.tenant);
+      const matchedRoutes = matchRoutes(routes, req.originalUrl);
 
-          content = ReactDOMServer.renderToString(app);
-          const html = ejs.render(template, {
-            appString: content,
-            initialState: JSON.stringify(store.getState()),
-            meta: "", //helmet.meta.toString(),
-            title: "", // helmet.title.toString(),
-            style: "", // helmet.style.toString(),
-            link: "", //helmet.link.toString(),
-            materialCss: "" // sheetsRegistry.toString()
+      const promises = [];
+      matchedRoutes.forEach(item => {
+        if (item.route.loadData) {
+          const promise = new Promise(resolve => {
+            item.route
+              .loadData(store)
+              .then(resolve)
+              .catch(resolve);
           });
-          res.send(html);
-          return;
-        });
-      } catch (e) {
-        console.log(e);
-      }
-      const html = ejs.render(template, {
-        appString: "",
-        initialState: JSON.stringify(store.getState()),
-        meta: "", //helmet.meta.toString(),
-        title: "", // helmet.title.toString(),
-        style: "", // helmet.style.toString(),
-        link: "", //helmet.link.toString(),
-        materialCss: "" // sheetsRegistry.toString()
+          promises.push(promise);
+        }
       });
-      res.send(html);
+
+      Promise.all(promises)
+        .then(() => {
+          const routerContext = {};
+          try {
+            let app = createApp(req.originalUrl, store, routerContext);
+            let content = ReactDOMServer.renderToString(app);
+            if (routerContext.action === "REPLACE") {
+              res.redirect(routerContext.url);
+              return;
+            }
+
+            res.send(
+              serverRender(template, {
+                content,
+                initialState: JSON.stringify(store.getState())
+              })
+            );
+          } catch (e) {
+            console.log(e);
+            res.send(
+              serverRender(template, {
+                initialState: JSON.stringify(store.getState())
+              })
+            );
+          }
+        })
+        .catch(e => {
+          console.log(e);
+        });
     });
   });
 };

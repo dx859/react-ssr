@@ -1,9 +1,9 @@
 import axios from "axios";
-import { createApiUrl } from "./urlUtils";
+import {createServerApiUrl} from "./urlUtils";
 
-const apiFetch = function(action, data = {}) {
-  let url = createApiUrl(action);
-
+const apiServerFetch = (apiPrefix, tenant) => (action, data = {}) => {
+  let url = createServerApiUrl(action, apiPrefix, tenant);
+  console.log(url)
   return new Promise((resolve, reject) => {
     axios
       .post(url, data)
@@ -18,6 +18,4 @@ const apiFetch = function(action, data = {}) {
   });
 };
 
-
-
-export default apiFetch;
+export default apiServerFetch;

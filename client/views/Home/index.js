@@ -1,20 +1,29 @@
-import React, { useState } from "react";
+import React, { useEffect } from "react";
 import classes from "./index.less";
+import { fetchMainPage } from "./store/action";
+import { connect } from "react-redux";
 
-import logoUrl from "./logo.png";
-
-
-const Home = () => {
-  const [count, setCount] = useState(0);
+const Home = props => {
+  useEffect(() => {
+    if (!props.hasData) {
+      props.fetchMainPage();
+    }
+  }, []);
 
   return (
     <div className={classes.wrap}>
-      <img src={logoUrl} alt="logo" />
-      <button onClick={() => setCount(count + 1)}>click me</button>
-      <p>count: {count}</p>
-      <h2>helom</h2>
+      {props.banner.map(item => {
+        return <img src={item.file_path} key={item.id} alt="" />;
+      })}
     </div>
   );
 };
 
-export default Home;
+Home.loadData = store => {
+  return store.dispatch(fetchMainPage());
+};
+
+export default connect(
+  state => ({ ...state.home }),
+  { fetchMainPage }
+)(Home);

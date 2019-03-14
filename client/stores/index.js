@@ -1,10 +1,13 @@
 import { createStore, applyMiddleware, combineReducers, compose } from "redux";
 import thunk from "redux-thunk";
-import promise from "redux-promise-middleware";
 import webConfig from "./webConfig";
+import homeReducer from "../views/Home/store/reducer";
+import apiServerFetch from "../utils/apiServerFetch";
+import apiFetch from "../utils/apiFetch";
 
 const reducer = combineReducers({
-  webConfig: webConfig
+  webConfig: webConfig,
+  home: homeReducer
 });
 
 export const getClientStore = (window = {}) => {
@@ -18,13 +21,22 @@ export const getClientStore = (window = {}) => {
         reducer,
         defaultState,
         compose(
-          applyMiddleware(promise, thunk),
+          applyMiddleware(thunk.withExtraArgument(apiFetch)),
           window.__REDUX_DEVTOOLS_EXTENSION__()
         )
       )
-    : createStore(reducer, defaultState, applyMiddleware(promise, thunk));
+    : createStore(
+        reducer,
+        defaultState,
+        applyMiddleware(thunk.withExtraArgument(apiFetch))
+      );
 };
 
-export const getServerStore = () => {
-  return createStore(reducer, applyMiddleware(promise, thunk));
+export const getServerStore = (apiPrefix, tenant) => {
+  return createStore(
+    reducer,
+    applyMiddleware(
+      thunk.withExtraArgument(apiServerFetch(apiPrefix, tenant))
+    )
+  );
 };

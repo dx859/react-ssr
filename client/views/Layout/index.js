@@ -1,13 +1,15 @@
 import React from "react";
 import Header from "./Header/";
 import Footer from "./Footer";
+import { Switch } from "react-router-dom";
+import { renderRoutes } from "react-router-config";
 
-const Layout = () => {
+const Layout = props => {
   console.log("render=Layout");
   return (
     <>
       <Header />
-      <div style={{ height: 1000 }}> </div>
+      <Switch>{renderRoutes(props.route.routes)}</Switch>
       <Footer />
     </>
   );

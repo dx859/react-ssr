@@ -1,35 +1,27 @@
-import React, { Component } from "react";
-import { Switch, Route, Redirect } from "react-router-dom";
+import React, { useEffect } from "react";
+import { Switch } from "react-router-dom";
+import { renderRoutes } from "react-router-config";
 import "./App.css";
 import { queryString } from "../utils/urlUtils";
 import { connect } from "react-redux";
 import { fetchWebConfig } from "../stores/webConfig";
-import Layout from "../views/Layout";
-import NotFound from "../views/NotFound/NotFound";
 
-class App extends Component {
-  componentDidMount() {
+const App = props => {
+  useEffect(() => {
     let qs = queryString(window.location.search);
-    this.props.fetchWebConfig();
-  }
+    if (!props.hasData) {
+      props.fetchWebConfig();
+    }
+  }, []);
 
-  render() {
-    return (
-      <Switch>
-        <Route
-          key="redirect"
-          exact
-          path="/hello"
-          render={() => <Redirect to="/znjs" />}
-        />
-        <Route key="/404" path="/404" component={NotFound} />
-        <Route key="/" path="/:tenant" component={Layout} />
-      </Switch>
-    );
-  }
-}
+  return <Switch>{renderRoutes(props.route.routes)}</Switch>;
+};
+
+App.loadData = store => {
+  return store.dispatch(fetchWebConfig());
+};
 
 export default connect(
-  null,
+  state => ({ hasData: state.webConfig.hasData }),
   { fetchWebConfig }
 )(App);

@@ -3,12 +3,12 @@ const path = require("path");
 const express = require("express");
 const ReactDOMServer = require("react-dom/server");
 const paths = require("../config/paths");
-
+const favicon = require("express-favicon");
 const isDevelopment = process.env.NODE_ENV === "development";
 const isProduction = process.env.NODE_ENV === "production";
 
 const app = express();
-
+app.use(favicon(path.join(__dirname, "../public/favicon.ico")));
 if (isProduction) {
   const serverEntry = require("../dist/server-entry");
   const template = fs.readFileSync(
@@ -18,7 +18,9 @@ if (isProduction) {
   app.use("/public", express.static(paths.appBuild));
 
   app.get("*", function(req, res) {
-    const appString = ReactDOMServer.renderToString(serverEntry.createApp(req.path));
+    const appString = ReactDOMServer.renderToString(
+      serverEntry.createApp(req.path)
+    );
     res.send(template.replace("<!-- appString -->", appString));
   });
 } else {

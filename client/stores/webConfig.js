@@ -1,17 +1,19 @@
-import apiFetch from "../utils/apiFetch";
 import api from "./api";
-import { getLocalData } from "../utils/localStore";
 
 export const FETCH_CONFIG = "FETCH_CONFIG";
 
-export const fetchWebConfig = () => ({
-  type: FETCH_CONFIG,
-  payload: apiFetch(api.getWebConfig)
-});
+export const fetchWebConfig = () => (dispatch, getState, apiFetch) =>{
+  return apiFetch(api.getWebConfig).then(data =>
+    dispatch({
+      type: FETCH_CONFIG,
+      payload: data
+    })
+  );
+}
+
 
 const defaultState = {
-  isFetching: false,
-  error: "",
+  hasData: false,
   primaryColor: "#009335",
   setting: {},
   logoFilePath: "",
@@ -21,21 +23,16 @@ const defaultState = {
 
 function webConfig(state = defaultState, action) {
   switch (action.type) {
-    case `${FETCH_CONFIG}_PENDING`:
-      return { ...state, isFetching: true };
-    case `${FETCH_CONFIG}_FULFILLED`:
+    case FETCH_CONFIG:
       return {
         ...state,
-        error: "",
-        isFetching: false,
+        hasData: true,
         primaryColor: action.payload.theme.primaryTheme.theme,
         loginFilePath: action.payload.systemLink.loginFilePath,
         logoFilePath: action.payload.systemLink.logoFilePath,
         developer: action.payload.developer,
         setting: action.payload.setting
       };
-    case `${FETCH_CONFIG}_REJECTED`:
-      return { ...state, error: action.payload.msg, isFetching: false };
     default:
       return state;
   }

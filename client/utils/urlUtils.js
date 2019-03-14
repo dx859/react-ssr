@@ -14,10 +14,8 @@ export function queryString(search) {
   return queryobj;
 }
 
-
-
 export function getTenantCode() {
-  return window.location.pathname.split('/')[1];
+  return window.location.pathname.split("/")[1];
 }
 
 export function createApiUrl(action, tenant) {
@@ -29,4 +27,12 @@ export function createApiUrl(action, tenant) {
   paramsArray.push(`o=${tenant}`);
   paramsArray.push(`p=${action}`);
   return "/api?" + paramsArray.join("&");
+}
+
+export function createServerApiUrl(action, apiPrefix, tenant) {
+  let paramsArray = [];
+  paramsArray.push(`r=CzSupplier/api/run`);
+  paramsArray.push(`o=${tenant}`);
+  paramsArray.push(`p=${action}`);
+  return apiPrefix + "?" + paramsArray.join("&");
 }
